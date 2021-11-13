@@ -11,9 +11,11 @@ datasource db {
 }
 
 model Order {
-  id    Int            @id @default(autoincrement())
-  done  Boolean        @default(false)
-  items ItemsInOrder[]
+  id     Int            @id @default(autoincrement())
+  user   User           @relation(fields: [userId], references: [id])
+  done   Boolean        @default(false)
+  items  ItemsInOrder[]
+  userId String
 }
 
 model ItemsInOrder {
@@ -27,10 +29,11 @@ model ItemsInOrder {
 }
 
 model Item {
-  id     Int            @id @default(autoincrement())
-  name   String
-  type   ItemType
-  orders ItemsInOrder[]
+  id          Int            @id @default(autoincrement())
+  name        String         @unique
+  description String?
+  type        ItemType
+  orders      ItemsInOrder[]
 }
 
 enum ItemType {
@@ -77,6 +80,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  Order         Order[]
 }
 
 model VerificationToken {
