@@ -14,7 +14,6 @@
         "@next-auth/prisma-adapter": "^0.5.2-next.19",
         "@prisma/client": "^3.4.2",
         "@shopify/polaris": "^7.3.0",
-        "babel-runtime": "^6.26.0",
         "firebase": "^9.4.1",
         "firebase-admin": "^10.0.0",
         "html5-qrcode": "^2.1.2",
