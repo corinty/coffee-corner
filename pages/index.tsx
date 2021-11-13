@@ -1,9 +1,9 @@
 import { useState } from "react";
 import type { NextPage, InferGetServerSidePropsType } from "next";
 import styles from "../styles/Home.module.css";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signIn, signOut, getSession } from "next-auth/react";
 import { Button, Card, Page } from "@shopify/polaris";
-import { getItems } from "@db/Item";
+import { getItems } from "@db/MenuItem";
 import { Item } from "@db/prisma";
 import { useMutation } from "react-query";
 import ky from "ky";
@@ -46,7 +46,7 @@ const Home: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
     return (
         <div className={styles.container}>
             <Page title="Corner Coffee Home Page" divider>
-                {!session ? (
+                {false ? (
                     <Card title="Sign In?" sectioned>
                         <Signin />
                     </Card>
@@ -106,12 +106,13 @@ const Home: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
     );
 };
 
-export const getServerSideProps = async () => {
+export const getServerSideProps = async (ctx) => {
     const menuItems = await getItems();
 
     return {
         props: {
             menuItems,
+            session: await getSession(ctx),
         },
     };
 };
