@@ -38,8 +38,6 @@ const Home: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
         store.remove,
     ]);
 
-    console.log({ cart, size: cart.size });
-
     return (
         <div className={styles.container}>
             <h1>Corner Coffee Home Page</h1>

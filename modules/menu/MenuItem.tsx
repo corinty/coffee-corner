@@ -20,7 +20,7 @@ export function MenuItem({ item: { id, name, description } }: Props) {
 
     return (
         <>
-            <div className="flex flex-col justify-between">
+            <div className="flex flex-col w-full">
                 <div>
                     <p className={`mb-${description ? "2" : "6"}`}>
                         <span className="text-2xl font-bold">{name}</span>
@@ -29,7 +29,7 @@ export function MenuItem({ item: { id, name, description } }: Props) {
                         {description && <span className="pl-5 italic">{description}</span>}
                     </p>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center justify-center gap-4 overflow-hidden">
                     <button
                         disabled={amount.length == 0 || (isInCart && !isDirty)}
                         className="w-1/2"
@@ -40,6 +40,7 @@ export function MenuItem({ item: { id, name, description } }: Props) {
                     >
                         {isInCart && isDirty ? "Update" : "Add"}
                     </button>
+
                     <Counter value={amount} onChange={setAmount} />
                 </div>
             </div>
