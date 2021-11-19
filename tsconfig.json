@@ -18,7 +18,8 @@
         "noImplicitAny": false,
         "paths": {
             "@db/*": ["./db/*"],
-            "@api/*": ["./api"]
+            "@modules/*": ["./modules/*"],
+            "@api/*": ["./api/*"]
         }
     },
     "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "firebaseClient.ts", "prisma/seed.js"],

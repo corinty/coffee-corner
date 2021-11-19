@@ -12,13 +12,16 @@ can use to fulfil the orders.
 -   [ ] Order Fulfillment Page
     -   [ ] Use Pusher to get live updates
     -   [ ] Button to easily fulfil whole order
-    -   [ ] Views
-        -   [ ] Chronological order
-        -   [ ] Group by item
+    -   [ ] Chronological order
+    -   [ ] Group by item
+-   [ ] User Auth - Should be super simple
+    -   [ ] WebAuthn
+    -   [ ] Phone Number
+    -   [ ] Token given to phone?
 
 ## Architecutre
 
 -   Next.js
 -   NextAuth.js
-    -   Use Github
--   Pusher
+-   Pusher - Live Updates
+-   Prisma - Typesafe ORM

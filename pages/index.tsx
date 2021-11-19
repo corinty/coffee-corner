@@ -1,12 +1,13 @@
-import { useState } from "react";
 import type { NextPage, InferGetServerSidePropsType } from "next";
 import styles from "../styles/Home.module.css";
 import { useSession, signIn, signOut, getSession } from "next-auth/react";
-import { Button, Card, Page } from "@shopify/polaris";
-import { getItems } from "@db/MenuItem";
-import { Item } from "@db/prisma";
+import { getItems } from "@db/Item";
+import type { ItemId } from "@db/Item";
 import { useMutation } from "react-query";
 import ky from "ky";
+import { useCartStore } from "@modules/order/hooks/useCartStore";
+import { Menu } from "@modules/menu/Menu";
+import { IMenu } from "@modules/menu/@types";
 
 export function Signin() {
     const { data: session } = useSession();
@@ -26,92 +27,84 @@ export function Signin() {
     );
 }
 
-const Home: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ menuItems }) => {
-    const [cart, setCart] = useState<{ [key: number]: Item }>({});
-    const { data: session } = useSession();
-
-    const mutation = useMutation(async (items: Item[]) =>
-        ky.post("/api/order", { json: { items } })
+const Home: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ menu }) => {
+    const mutation = useMutation(async (itemIds: ItemId[]) =>
+        ky.post("/api/order", { json: { itemIds } })
     );
 
-    const addToCart = (item: Item) => {
-        setCart((curCart) => ({ ...curCart, [item.id]: item }));
-    };
-    const removeFromCart = (item: Item) => {
-        setCart((curCart) => {
-            delete curCart[item.id];
-            return { ...curCart };
-        });
-    };
+    const [cart, clearCart, removeItem] = useCartStore((store) => [
+        store.cart,
+        store.clear,
+        store.remove,
+    ]);
+
+    console.log({ cart, size: cart.size });
+
     return (
         <div className={styles.container}>
-            <Page title="Corner Coffee Home Page" divider>
-                {false ? (
-                    <Card title="Sign In?" sectioned>
-                        <Signin />
-                    </Card>
-                ) : (
-                    <>
-                        <Card title="Menu" sectioned>
-                            <ul>
-                                {menuItems.map((item) => {
-                                    const { name, description, type, id } = item;
-                                    return (
-                                        <li
-                                            key={name}
-                                            style={{ padding: "10px" }}
-                                            onClick={() => {
-                                                if (cart[id]) {
-                                                    removeFromCart(item);
-                                                } else {
-                                                    addToCart(item);
-                                                }
-                                            }}
-                                        >
-                                            <p>
-                                                {name}: {type}
-                                            </p>
-                                            <p>{description}</p>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        </Card>
-                        <Card sectioned title="Cart">
-                            <ul>
-                                {Object.values(cart).map((item) => {
-                                    return <li key={item.id}>{item.name}</li>;
-                                })}
-                            </ul>
-                            <div style={{ display: "flex", gap: 16 }}>
-                                <Button destructive onClick={() => setCart({})}>
-                                    Clear Cart
-                                </Button>
-                                <Button
-                                    onClick={async () => {
-                                        console.log(Object.values(cart));
-
-                                        const res = await mutation.mutate(Object.values(cart));
-                                        console.log({ res });
-                                    }}
-                                >
-                                    Place Order
-                                </Button>
-                            </div>
-                        </Card>
-                    </>
-                )}
-            </Page>
+            <h1>Corner Coffee Home Page</h1>
+            {false ? (
+                <Signin />
+            ) : (
+                <>
+                    <Menu menu={menu} />
+                    <div title="Cart">
+                        <h1>Cart</h1>
+                        <hr />
+                        <ul>
+                            {Array.from(cart.values()).map(({ amount, id }) => {
+                                return (
+                                    <li key={id} onClick={() => removeItem(id)}>
+                                        {id}: {menu.itemMap[id].name}, Amount: {amount}
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                        <div style={{ display: "flex", gap: 16 }}>
+                            <button
+                                style={{ background: "var(--red)" }}
+                                disabled={cart.size <= 0}
+                                onClick={() => {
+                                    clearCart();
+                                }}
+                            >
+                                Clear Cart
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    // console.log(Object.values(cart));
+                                    // const res = await mutation.mutate(cart);
+                                    // console.log({ res });
+                                }}
+                            >
+                                Place Order
+                            </button>
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 };
 
 export const getServerSideProps = async (ctx) => {
-    const menuItems = await getItems();
+    const items = await getItems();
+
+    const menu = items.reduce(
+        (map, item) => {
+            const { id, type } = item;
+            if (!map.types[type]) map.types[type] = [];
+            map.types[type].push(id);
+            map.itemMap[id] = item;
+
+            return map;
+        },
+        { types: {}, itemMap: {} } as IMenu
+    );
 
     return {
         props: {
-            menuItems,
+            menu,
             session: await getSession(ctx),
         },
     };

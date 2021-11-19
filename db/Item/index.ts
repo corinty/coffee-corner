@@ -1,4 +1,7 @@
-import prisma, { Item } from "@db/prisma";
+import prisma, { Item as PrismaItem } from "@db/prisma";
+
+export type ItemId = Item["id"];
+export type Item = PrismaItem;
 
 export const getItems = async () => prisma.item.findMany();
 
