@@ -5,9 +5,9 @@ import { getItems } from "@db/Item";
 import type { ItemId } from "@db/Item";
 import { useMutation } from "react-query";
 import ky from "ky";
-import { useCartStore } from "@modules/order/hooks/useCartStore";
 import { Menu } from "@modules/menu/Menu";
 import { IMenu } from "@modules/menu/@types";
+import Cart from "@modules/cart/Cart";
 
 export function Signin() {
     const { data: session } = useSession();
@@ -32,12 +32,6 @@ const Home: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
         ky.post("/api/order", { json: { itemIds } })
     );
 
-    const [cart, clearCart, removeItem] = useCartStore((store) => [
-        store.cart,
-        store.clear,
-        store.remove,
-    ]);
-
     return (
         <div className={styles.container}>
             <h1>Corner Coffee Home Page</h1>
@@ -46,39 +40,7 @@ const Home: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
             ) : (
                 <>
                     <Menu menu={menu} />
-                    <div title="Cart">
-                        <h1>Cart</h1>
-                        <hr />
-                        <ul>
-                            {Array.from(cart.values()).map(({ amount, id }) => {
-                                return (
-                                    <li key={id} onClick={() => removeItem(id)}>
-                                        {id}: {menu.itemMap[id].name}, Amount: {amount}
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                        <div style={{ display: "flex", gap: 16 }}>
-                            <button
-                                style={{ background: "var(--red)" }}
-                                disabled={cart.size <= 0}
-                                onClick={() => {
-                                    clearCart();
-                                }}
-                            >
-                                Clear Cart
-                            </button>
-                            <button
-                                onClick={async () => {
-                                    // console.log(Object.values(cart));
-                                    // const res = await mutation.mutate(cart);
-                                    // console.log({ res });
-                                }}
-                            >
-                                Place Order
-                            </button>
-                        </div>
-                    </div>
+                    <Cart menu={menu} />
                 </>
             )}
         </div>

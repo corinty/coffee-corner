@@ -26,7 +26,7 @@ const Counter: React.FC<Props> = ({ value, onChange, max }: Props) => {
         onChange(nextValue());
     };
     return (
-        <div className="flex items-center gap-3 overflow-hidden flex-shrink-2">
+        <div className="flex items-center w-full gap-3">
             <button
                 name="increment"
                 onClick={() => handleClick(ActionType.decrement)}
@@ -54,7 +54,7 @@ const Counter: React.FC<Props> = ({ value, onChange, max }: Props) => {
                     onChange(value);
                 }}
                 pattern="[0-9]*"
-                className="px-3 py-1 text-xl text-center border-2 border-black border-solid rounded "
+                className="w-1/2 px-3 py-1 text-xl text-center border-2 border-black border-solid rounded "
             ></input>
             <button
                 name="decrement"

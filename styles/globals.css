@@ -12,6 +12,7 @@ body {
 }
 ul {
     list-style: none !important;
+    padding: 0 !important;
 }
 button:disabled {
     background: var(--light-gray) !important;

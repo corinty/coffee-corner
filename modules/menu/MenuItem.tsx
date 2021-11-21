@@ -1,6 +1,6 @@
 import type { Item } from "@db/prisma";
 import { useState, useEffect } from "react";
-import { useCartStore } from "../order/hooks/useCartStore";
+import { useCartStore } from "../cart/hooks/useCartStore";
 import Counter from "./components/Counter";
 
 type Props = {
@@ -29,7 +29,7 @@ export function MenuItem({ item: { id, name, description } }: Props) {
                         {description && <span className="pl-5 italic">{description}</span>}
                     </p>
                 </div>
-                <div className="flex items-center justify-center gap-4 overflow-hidden">
+                <div className="flex flex-wrap-reverse items-center justify-center gap-4 overflow-hidden md:flex-nowrap">
                     <button
                         disabled={amount.length == 0 || (isInCart && !isDirty)}
                         className="w-1/2"
