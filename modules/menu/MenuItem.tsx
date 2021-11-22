@@ -1,4 +1,5 @@
 import type { Item } from "@db/prisma";
+import { useInCart } from "@modules/cart/hooks/useInCart";
 import { useState, useEffect } from "react";
 import { useCartStore } from "../cart/hooks/useCartStore";
 import Counter from "./components/Counter";
@@ -8,15 +9,21 @@ type Props = {
 };
 
 export function MenuItem({ item: { id, name, description } }: Props) {
-    const add = useCartStore((store) => store.add);
-    const isInCart = useCartStore((store) => store.cart.has(id));
+    const { add, cartMap } = useCartStore();
+    const isInCart = cartMap.has(id);
 
     const [isDirty, setisDirty] = useState(false);
-    const [amount, setAmount] = useState("1");
+    const [quantity, setQuantity] = useState("1");
 
     useEffect(() => {
         setisDirty(true);
-    }, [amount]);
+    }, [quantity]);
+
+    const buttonText = () => {
+        if (!isInCart) return "Add";
+        if (!isDirty) return "In Cart";
+        if (isDirty) return "Update Cart";
+    };
 
     return (
         <>
@@ -31,17 +38,17 @@ export function MenuItem({ item: { id, name, description } }: Props) {
                 </div>
                 <div className="flex flex-wrap-reverse items-center justify-center gap-4 overflow-hidden md:flex-nowrap">
                     <button
-                        disabled={amount.length == 0 || (isInCart && !isDirty)}
+                        disabled={quantity.length == 0 || (isInCart && !isDirty)}
                         className="w-1/2"
                         onClick={() => {
-                            if (amount.length > 0) add(id, parseInt(amount));
+                            if (quantity.length > 0) add(id, parseInt(quantity));
                             setisDirty(false);
                         }}
                     >
-                        {isInCart && isDirty ? "Update" : "Add"}
+                        {buttonText()}
                     </button>
 
-                    <Counter value={amount} onChange={setAmount} />
+                    <Counter value={quantity} onChange={setQuantity} />
                 </div>
             </div>
         </>

@@ -16,20 +16,4 @@ const items = [
     });
 
     await prisma.item.createMany({ skipDuplicates: true, data: items });
-
-    await prisma.order.create({
-        data: {
-            user: {
-                connect: {
-                    email: "corin.mchargue@test.com",
-                },
-            },
-            items: {
-                createMany: {
-                    skipDuplicates: true,
-                    data: [{ itemId: 2 }, { itemId: 3 }, { itemId: 1 }],
-                },
-            },
-        },
-    });
 })();

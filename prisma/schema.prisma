@@ -13,19 +13,20 @@ datasource db {
 model Order {
   id     Int            @id @default(autoincrement())
   user   User           @relation(fields: [userId], references: [id])
+  userId String
   done   Boolean        @default(false)
   items  ItemsInOrder[]
-  userId String
 }
 
 model ItemsInOrder {
+  id      Int     @default(autoincrement())
   order   Order   @relation(fields: [orderId], references: [id])
   orderId Int
   item    Item    @relation(fields: [itemId], references: [id])
   itemId  Int
   done    Boolean @default(false)
 
-  @@id([itemId, orderId])
+  @@id([itemId, orderId, id])
 }
 
 model Item {

@@ -1,49 +1,46 @@
-import { IMenu } from "@modules/menu/@types";
+import ky from "ky";
+import { useRouter } from "next/router";
+import { useMutation } from "react-query";
+import { CartList } from "./components/CartList";
 import { useCartStore } from "./hooks/useCartStore";
-type Props = {
-    menu: IMenu;
-};
 
-export default function Cart({ menu }: Props) {
-    const [cart, removeItem, clearCart] = useCartStore((store) => [
-        store.cart,
-        store.remove,
-        store.clear,
-    ]);
+type Props = {};
+
+export default function Cart({}: Props) {
+    const { cart, cartMap, clear: clearCart } = useCartStore();
+    const router = useRouter();
+
+    const mutation = useMutation(() => ky.post("/api/order/create", { json: cart }), {
+        onMutate() {},
+        onSuccess() {
+            router.push("/order/complete");
+            clearCart();
+        },
+    });
     return (
         <div className="mb-16">
             <h1>Cart</h1>
             <hr />
-            <ul>
-                {Array.from(cart.values()).map(({ amount, id }) => {
-                    const { name } = menu.itemMap[id];
-                    return (
-                        <li key={id} onClick={() => removeItem(id)}>
-                            <p>
-                                <span className="font-bold">{name}</span> - Qty: {amount}
-                            </p>
-                        </li>
-                    );
-                })}
-            </ul>
+            <CartList />
             <div className="flex gap-4">
+                {!mutation.isLoading && (
+                    <button
+                        style={{ background: "var(--red)" }}
+                        disabled={mutation.isLoading || cartMap.size <= 0}
+                        onClick={() => {
+                            clearCart();
+                        }}
+                    >
+                        Clear Cart
+                    </button>
+                )}
                 <button
-                    style={{ background: "var(--red)" }}
-                    disabled={cart.size <= 0}
-                    onClick={() => {
-                        clearCart();
-                    }}
-                >
-                    Clear Cart
-                </button>
-                <button
+                    disabled={mutation.isLoading}
                     onClick={async () => {
-                        // console.log(Object.values(cart));
-                        // const res = await mutation.mutate(cart);
-                        // console.log({ res });
+                        mutation.mutate();
                     }}
                 >
-                    Place Order
+                    {mutation.isLoading ? "Submitting..." : "Place Order"}
                 </button>
             </div>
         </div>

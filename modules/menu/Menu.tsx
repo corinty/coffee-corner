@@ -1,10 +1,10 @@
 import { MenuItem } from "./MenuItem";
-import { IMenu } from "./@types";
+import { useMenu } from "./hooks/useMenu";
 
-type Props = {
-    menu: IMenu;
-};
-export const Menu = ({ menu }: Props) => {
+type Props = {};
+export const Menu = ({}: Props) => {
+    const [menu] = useMenu();
+    if (!menu) return <p className="text-red-600">Error Loading Menu...</p>;
     const { itemMap, types } = menu;
     return (
         <div title="Menu">

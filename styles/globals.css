@@ -10,8 +10,11 @@ body {
     --secondary: #4f7692;
     --red: #b61417;
 }
+body {
+    padding: 1rem;
+}
 ul {
-    list-style: none !important;
+    list-style: none;
     padding: 0 !important;
 }
 button:disabled {

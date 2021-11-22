@@ -1,22 +1,23 @@
-import create from "zustand";
-import { withImmer } from "common/withImmer";
+import type { Item, ItemId } from "@db/Item";
+import { useAtom } from "jotai";
+import cartAtom from "./cartAtom";
 
-import type { Item } from "@db/prisma";
-type ItemId = Item["id"];
-
-export const useCartStore = create(
-    withImmer({ cart: new Map<ItemId, { id: ItemId; amount: number }>() }, (set) => ({
-        add: (itemId: ItemId, amount: number) =>
-            set((draft) => {
-                draft.cart.set(itemId, { id: itemId, amount });
+export const useCartStore = () => {
+    const [cart, set] = useAtom(cartAtom);
+    return {
+        cart: Array.from(cart.values()),
+        cartMap: cart,
+        add: (itemId: ItemId, quantity: number) =>
+            set((cart) => {
+                cart.set(itemId, { itemId, quantity });
             }),
         remove: (itemId: ItemId) =>
-            set((draft) => {
-                draft.cart.delete(itemId);
+            set((cart) => {
+                cart.delete(itemId);
             }),
         clear: () =>
-            set((draft) => {
-                draft.cart.clear();
+            set((cart) => {
+                cart.clear();
             }),
-    }))
-);
+    };
+};
