@@ -9,9 +9,11 @@ body {
     --light-primary: #68637e;
     --secondary: #4f7692;
     --red: #b61417;
+    max-width: unset;
 }
 body {
-    padding: 1rem;
+    box-sizing: border-box;
+    padding: 0 1.5vw;
 }
 ul {
     list-style: none;

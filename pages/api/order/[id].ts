@@ -1,7 +1,7 @@
 import { ItemId } from "@db/Item";
 import { getOrderById } from "@db/Order";
 import prisma from "@db/prisma";
-import { ICart } from "@modules/cart/hooks/useCartStore";
+import { ICart } from "@modules/cart/hooks/cartAtom";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 

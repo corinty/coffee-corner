@@ -1,4 +1,3 @@
-import "../wydr";
 import "tailwindcss/tailwind.css";
 import "../node_modules/axist/dist/axist.min.css";
 import "../styles/globals.css";

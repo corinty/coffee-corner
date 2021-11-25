@@ -1,22 +1,39 @@
 import { getMenuMap } from "@db/Menu";
 import { getOpenOrders } from "@db/Order";
+import styles from "../styles/Fulfilment.module.scss";
 import type { NextPage, InferGetServerSidePropsType } from "next";
+import { useQuery, useQueryClient } from "react-query";
+import ky from "ky";
+import { useFulfillItemMutation } from "@modules/fulfillment/hooks/useFulfillItemMutation";
 
 const Fulfillment: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
-    orders,
+    initialOrders,
     menuMap,
 }) => {
+    const queryClient = useQueryClient();
+    const { data: orders, isLoading } = useQuery<typeof initialOrders>(
+        "openOrders",
+        () => ky("/api/order/open").json(),
+        {
+            initialData: initialOrders,
+
+        }
+    );
+    const mutation = useFulfillItemMutation();
+    if (isLoading || !orders) return <p>Loading...</p>;
+
     return (
         <>
             <h1>Order Fulfillment</h1>
             <hr />
-            <div className="flex flex-wrap gap-4 order-grid">
+
+            <div className={styles.grid}>
                 {orders.map((order) => {
                     const { done, items } = order;
                     return (
                         <div
-                            className="w-1/3 p-4 border-gray-700 border-solid rounded shadow"
-                            key={order.id}
+                            className="p-4 border-gray-700 border-solid rounded shadow "
+                            key={order.id + "order"}
                         >
                             <ul className="list-disc">
                                 <li>Order ID: {order.id}</li>
@@ -25,15 +42,20 @@ const Fulfillment: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
                             </ul>
                             <hr />
                             <ul>
-                                {items.map(({ itemId, done }) => {
+                                {items.map(({ itemId, done, id }, index) => {
                                     const { name } = menuMap[itemId];
                                     return (
-                                        <li key={itemId} className="flex justify-between gap-4">
+                                        <li key={id} className="flex justify-between gap-4">
                                             <p>
                                                 <strong>{name}</strong>
-                                            </p>{" "}
+                                            </p>
                                             {!done ? (
-                                                <button style={{ background: "var(--secondary)" }}>
+                                                <button
+                                                    style={{ background: "var(--secondary)" }}
+                                                    onClick={() => {
+                                                        mutation.mutate(id);
+                                                    }}
+                                                >
                                                     Done
                                                 </button>
                                             ) : (
@@ -47,12 +69,17 @@ const Fulfillment: NextPage<InferGetServerSidePropsType<typeof getServerSideProp
                     );
                 })}
             </div>
+            <style jsx>{`
+                .order-grid {
+                    display: ;
+                }
+            `}</style>
         </>
     );
 };
 
 export const getServerSideProps = async (ctx) => {
-    return { props: { orders: await getOpenOrders(), menuMap: await getMenuMap() } };
+    return { props: { initialOrders: await getOpenOrders(), menuMap: await getMenuMap() } };
 };
 
 export default Fulfillment;

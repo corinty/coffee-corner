@@ -6,35 +6,37 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+
 }
 
 model Order {
-  id     Int            @id @default(autoincrement())
-  user   User           @relation(fields: [userId], references: [id])
+  id     Int         @id @default(autoincrement())
+  user   User        @relation(fields: [userId], references: [id])
   userId String
-  done   Boolean        @default(false)
-  items  ItemsInOrder[]
+  done   Boolean     @default(false)
+  items  OrderItem[]
 }
 
-model ItemsInOrder {
-  id      Int     @default(autoincrement())
+model OrderItem {
+  id      Int     @id @default(autoincrement())
   order   Order   @relation(fields: [orderId], references: [id])
   orderId Int
   item    Item    @relation(fields: [itemId], references: [id])
   itemId  Int
   done    Boolean @default(false)
 
-  @@id([itemId, orderId, id])
+  @@map("ItemInOrder")
 }
 
 model Item {
-  id          Int            @id @default(autoincrement())
-  name        String         @unique
+  id          Int         @id @default(autoincrement())
+  name        String      @unique
   description String?
   type        ItemType
-  orders      ItemsInOrder[]
+  orders      OrderItem[]
 }
 
 enum ItemType {

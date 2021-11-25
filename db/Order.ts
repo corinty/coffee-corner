@@ -33,8 +33,12 @@ export const getOpenOrders = async () =>
             },
             items: {
                 select: {
+                    id: true,
                     done: true,
                     itemId: true,
+                },
+                orderBy: {
+                    id: "desc",
                 },
             },
         },
